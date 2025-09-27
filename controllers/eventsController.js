@@ -4,7 +4,10 @@ const {
   getEvent,
   deleteEvent,
   getEvents,
+  getEventsByDate,
 } = require("../models/eventsModel");
+const { EventDateType } = require("../constants/enums");
+const { isValidEventDateType } = require("../utils/utils");
 
 // Create a new event
 const createNewEvent = async (req, res) => {
@@ -85,10 +88,29 @@ const deleteExistingEvent = async (req, res) => {
   }
 };
 
+// Get past or upcoming events
+const getEventsFilteredByDate = async (req, res) => {
+  try {
+    const type = req.query.type?.toLowerCase();
+    console.log(isValidEventDateType(type));
+    if (!type || ![EventDateType.PAST, EventDateType.UPCOMING].includes(type)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid type. Use 'past' or 'upcoming'." });
+    }
+
+    const events = await getEventsByDate(type.toLowerCase());
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   createNewEvent,
   getAllEvents,
   getSingleEvent,
   updateExistingEvent,
   deleteExistingEvent,
+  getEventsFilteredByDate,
 };

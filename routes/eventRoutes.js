@@ -6,11 +6,13 @@ const {
   getSingleEvent,
   updateExistingEvent,
   deleteExistingEvent,
+  getEventsFilteredByDate,
 } = require("../controllers/eventsController");
 
 const { protect } = require("../middleware/authMiddleware");
 
 // Public routes
+router.get("/filter", getEventsFilteredByDate);
 router.get("/", getAllEvents);
 router.get("/:id", getSingleEvent);
 

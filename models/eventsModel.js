@@ -1,5 +1,5 @@
 const pool = require("../config/db");
-
+const EventDateType = require("../constants/enums");
 // Create a new event
 async function createEvent(
   title,
@@ -64,10 +64,36 @@ async function getEvents() {
   return result.rows;
 }
 
+// Get all events (can add filters later)
+async function getEvents() {
+  const result = await pool.query(
+    `SELECT * FROM events ORDER BY date_time ASC`
+  );
+  return result.rows;
+}
+
+// Get events filtered by date
+async function getEventsByDate(type) {
+  let query;
+  const now = new Date();
+
+  if (type === "past") {
+    query = `SELECT * FROM events WHERE date_time < $1 ORDER BY date_time DESC`;
+  } else if (type === "upcoming") {
+    query = `SELECT * FROM events WHERE date_time >= $1 ORDER BY date_time ASC`;
+  } else {
+    throw new Error("Invalid type. Use 'past' or 'upcoming'.");
+  }
+
+  const result = await pool.query(query, [now]);
+  return result.rows;
+}
+
 module.exports = {
   createEvent,
   updateEvent,
   getEvent,
   deleteEvent,
   getEvents,
+  getEventsByDate,
 };
