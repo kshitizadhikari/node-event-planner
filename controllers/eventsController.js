@@ -92,7 +92,6 @@ const deleteExistingEvent = async (req, res) => {
 const getEventsFilteredByDate = async (req, res) => {
   try {
     const type = req.query.type?.toLowerCase();
-    console.log(isValidEventDateType(type));
     if (!type || ![EventDateType.PAST, EventDateType.UPCOMING].includes(type)) {
       return res
         .status(400)

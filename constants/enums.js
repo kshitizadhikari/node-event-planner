@@ -3,6 +3,11 @@ const EventDateType = {
   UPCOMING: "upcoming",
 };
 
+const EventType = {
+  PUBLIC: "public",
+  PRIVATE: "private",
+};
+
 module.exports = {
   EventDateType,
 };
