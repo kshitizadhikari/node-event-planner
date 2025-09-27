@@ -20,7 +20,6 @@ async function init() {
 
     // Create Events table
     await pool.query(`
-
       CREATE TABLE events (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         title VARCHAR(100) NOT NULL,
