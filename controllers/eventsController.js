@@ -10,7 +10,7 @@ const {
 const createNewEvent = async (req, res) => {
   try {
     const { title, description, date_time, location, type } = req.body;
-    const user_id = req.user.id; // from auth middleware
+    const user_id = req.user.userId; // from auth middleware
     const event = await createEvent(
       title,
       description,
@@ -50,7 +50,7 @@ const getSingleEvent = async (req, res) => {
 const updateExistingEvent = async (req, res) => {
   try {
     const { title, description, date_time, location, type } = req.body;
-    const user_id = req.user.id;
+    const user_id = req.user.userId;
     const event = await updateEvent(
       req.params.id,
       title,
@@ -73,7 +73,7 @@ const updateExistingEvent = async (req, res) => {
 // Delete an event (owner only)
 const deleteExistingEvent = async (req, res) => {
   try {
-    const user_id = req.user.id;
+    const user_id = req.user.userId;
     const event = await deleteEvent(req.params.id, user_id);
     if (!event)
       return res
