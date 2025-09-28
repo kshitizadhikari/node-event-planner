@@ -1,5 +1,5 @@
 const pool = require("../config/db");
-const EventDateType = require("../constants/enums");
+
 // Create a new event
 async function createEvent(
   title,
@@ -45,6 +45,13 @@ async function updateEvent(
 async function getEvent(id) {
   const result = await pool.query(`SELECT * FROM events WHERE id = $1`, [id]);
   return result.rows[0];
+}
+
+async function getUserEvents(user_id) {
+  const result = await pool.query(`SELECT * FROM events WHERE user_id = $1`, [
+    user_id,
+  ]);
+  return result.rows;
 }
 
 // Delete an event (only by the owner)
@@ -96,4 +103,5 @@ module.exports = {
   deleteEvent,
   getEvents,
   getEventsByDate,
+  getUserEvents,
 };

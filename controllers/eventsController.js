@@ -5,11 +5,11 @@ const {
   deleteEvent,
   getEvents,
   getEventsByDate,
+  getUserEvents,
 } = require("../models/eventsModel");
 const { EventDateType } = require("../constants/enums");
 const { isValidEventDateType } = require("../utils/utils");
 
-// Create a new event
 const createNewEvent = async (req, res) => {
   try {
     const { title, description, date_time, location, type } = req.body;
@@ -28,7 +28,6 @@ const createNewEvent = async (req, res) => {
   }
 };
 
-// Get all events
 const getAllEvents = async (req, res) => {
   try {
     const events = await getEvents();
@@ -38,7 +37,16 @@ const getAllEvents = async (req, res) => {
   }
 };
 
-// Get a single event by ID
+const getMyEvents = async (req, res) => {
+  try {
+    const user_id = req.user.userId;
+    const events = await getUserEvents(user_id);
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 const getSingleEvent = async (req, res) => {
   try {
     const event = await getEvent(req.params.id);
@@ -49,7 +57,6 @@ const getSingleEvent = async (req, res) => {
   }
 };
 
-// Update an event (owner only)
 const updateExistingEvent = async (req, res) => {
   try {
     const { title, description, date_time, location, type } = req.body;
@@ -73,7 +80,6 @@ const updateExistingEvent = async (req, res) => {
   }
 };
 
-// Delete an event (owner only)
 const deleteExistingEvent = async (req, res) => {
   try {
     const user_id = req.user.userId;
@@ -88,7 +94,6 @@ const deleteExistingEvent = async (req, res) => {
   }
 };
 
-// Get past or upcoming events
 const getEventsFilteredByDate = async (req, res) => {
   try {
     const type = req.query.type?.toLowerCase();
@@ -112,4 +117,5 @@ module.exports = {
   updateExistingEvent,
   deleteExistingEvent,
   getEventsFilteredByDate,
+  getMyEvents,
 };
