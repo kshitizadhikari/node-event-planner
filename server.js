@@ -7,11 +7,12 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const tagRoutes = require("./routes/tagRoutes");
+const eventTagRoutes = require("./routes/eventTagRoutes");
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/events", eventRoutes);
-app.use("/tags", tagRoutes);
+app.use("/event-tags", eventTagRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>

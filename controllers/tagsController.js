@@ -3,6 +3,13 @@ const { createTag, getTags, deleteTag } = require("../models/tagsModel");
 const createNewTag = async (req, res) => {
   const { name } = req.body;
   try {
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return res
+        .status(400)
+        .json({
+          message: "Tag name is required and must not be a non-empty string",
+        });
+    }
     const tag = await createTag(name);
     res.status(201).json(tag);
   } catch (err) {
