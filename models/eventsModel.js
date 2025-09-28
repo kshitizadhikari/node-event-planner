@@ -138,6 +138,33 @@ async function getEventsByDate(type) {
   return result.rows;
 }
 
+async function getEventsByTags(tagNames) {
+  if (!Array.isArray(tagNames) || tagNames.length === 0) return [];
+
+  const placeholders = tagNames.map((_, i) => `$${i + 1}`).join(", ");
+
+  const result = await pool.query(
+    `
+    SELECT e.*,
+           COALESCE(
+             JSON_AGG(
+               JSON_BUILD_OBJECT('id', t.id, 'name', t.name)
+             ) FILTER (WHERE t.id IS NOT NULL),
+             '[]'
+           ) AS tags
+    FROM events e
+    JOIN event_tags et ON e.id = et.event_id
+    JOIN tags t ON et.tag_id = t.id
+    WHERE t.name IN (${placeholders})
+    GROUP BY e.id
+    ORDER BY e.date_time ASC
+    `,
+    tagNames
+  );
+
+  return result.rows;
+}
+
 module.exports = {
   createEvent,
   updateEvent,
@@ -146,4 +173,5 @@ module.exports = {
   getEvents,
   getEventsByDate,
   getUserEvents,
+  getEventsByTags,
 };

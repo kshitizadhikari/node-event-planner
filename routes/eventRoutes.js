@@ -1,20 +1,17 @@
 const express = require("express");
+const { protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 const {
   createNewEvent,
-  getAllEvents,
   getSingleEvent,
   updateExistingEvent,
   deleteExistingEvent,
-  getEventsFilteredByDate,
   getMyEvents,
+  getEventsFiltered,
 } = require("../controllers/eventsController");
 
-const { protect } = require("../middleware/authMiddleware");
-
-router.get("/filter", getEventsFilteredByDate);
 router.get("/user-events", protect, getMyEvents);
-router.get("/", getAllEvents);
+router.get("/", getEventsFiltered);
 router.get("/:id", getSingleEvent);
 router.post("/", protect, createNewEvent);
 router.put("/:id", protect, updateExistingEvent);
