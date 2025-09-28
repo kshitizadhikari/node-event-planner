@@ -4,8 +4,9 @@ const {
   assignTagsToAnEvent,
   removeTags,
 } = require("../controllers/eventTagsController");
+const { protect } = require("../middleware/authMiddleware");
 
-router.post("/", assignTagsToAnEvent);
-router.delete("/", removeTags);
+router.post("/", protect, assignTagsToAnEvent);
+router.delete("/", protect, removeTags);
 
 module.exports = router;

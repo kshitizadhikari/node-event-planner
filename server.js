@@ -1,6 +1,14 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 const authRoutes = require("./routes/authRoutes");
@@ -12,6 +20,7 @@ const eventTagRoutes = require("./routes/eventTagRoutes");
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/events", eventRoutes);
+app.use("/tags", tagRoutes);
 app.use("/event-tags", eventTagRoutes);
 
 const PORT = process.env.PORT || 3000;

@@ -10,10 +10,11 @@ const {
 } = require("../models/eventsModel");
 const { EventDateType } = require("../constants/enums");
 const { isValidEventDateType } = require("../utils/utils");
+const { assignTagsToEvent } = require("../models/eventTagsModel");
 
 const createNewEvent = async (req, res) => {
   try {
-    const { title, description, date_time, location, type } = req.body;
+    const { title, description, date_time, location, type, tag_ids } = req.body;
     const user_id = req.user.userId; // from auth middleware
     const event = await createEvent(
       title,
@@ -23,6 +24,8 @@ const createNewEvent = async (req, res) => {
       type,
       user_id
     );
+
+    const tags = await assignTagsToEvent(event.id, tag_ids);
     res.status(201).json(event);
   } catch (err) {
     res.status(500).json({ message: err.message });
