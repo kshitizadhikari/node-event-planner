@@ -42,8 +42,26 @@ async function updateEvent(
 }
 
 // Get a single event by ID
+// Get a single event by ID with tags
 async function getEvent(id) {
-  const result = await pool.query(`SELECT * FROM events WHERE id = $1`, [id]);
+  const result = await pool.query(
+    `
+    SELECT e.*,
+           COALESCE(
+             JSON_AGG(
+               JSON_BUILD_OBJECT('id', t.id, 'name', t.name)
+             ) FILTER (WHERE t.id IS NOT NULL),
+             '[]'
+           ) AS tags
+    FROM events e
+    LEFT JOIN event_tags et ON e.id = et.event_id
+    LEFT JOIN tags t ON et.tag_id = t.id
+    WHERE e.id = $1
+    GROUP BY e.id
+    `,
+    [id]
+  );
+
   return result.rows[0];
 }
 
@@ -63,36 +81,60 @@ async function deleteEvent(id, user_id) {
   return result.rows[0];
 }
 
-// Get all events (can add filters later)
+// Get all events with tags
 async function getEvents() {
   const result = await pool.query(
-    `SELECT * FROM events ORDER BY date_time ASC`
+    `
+    SELECT e.*,
+           COALESCE(
+             JSON_AGG(
+               JSON_BUILD_OBJECT('id', t.id, 'name', t.name)
+             ) FILTER (WHERE t.id IS NOT NULL),
+             '[]'
+           ) AS tags
+    FROM events e
+    LEFT JOIN event_tags et ON e.id = et.event_id
+    LEFT JOIN tags t ON et.tag_id = t.id
+    GROUP BY e.id
+    ORDER BY e.date_time ASC
+    `
   );
   return result.rows;
 }
 
-// Get all events (can add filters later)
-async function getEvents() {
-  const result = await pool.query(
-    `SELECT * FROM events ORDER BY date_time ASC`
-  );
-  return result.rows;
-}
-
-// Get events filtered by date
+// Get past or upcoming events with tags
 async function getEventsByDate(type) {
-  let query;
-  const now = new Date();
+  let comparator, order;
 
   if (type === "past") {
-    query = `SELECT * FROM events WHERE date_time < $1 ORDER BY date_time DESC`;
+    comparator = "<";
+    order = "DESC";
   } else if (type === "upcoming") {
-    query = `SELECT * FROM events WHERE date_time >= $1 ORDER BY date_time ASC`;
+    comparator = ">=";
+    order = "ASC";
   } else {
     throw new Error("Invalid type. Use 'past' or 'upcoming'.");
   }
 
-  const result = await pool.query(query, [now]);
+  const result = await pool.query(
+    `
+    SELECT e.*,
+           COALESCE(
+             JSON_AGG(
+               JSON_BUILD_OBJECT('id', t.id, 'name', t.name)
+             ) FILTER (WHERE t.id IS NOT NULL),
+             '[]'
+           ) AS tags
+    FROM events e
+    LEFT JOIN event_tags et ON e.id = et.event_id
+    LEFT JOIN tags t ON et.tag_id = t.id
+    WHERE e.date_time ${comparator} $1
+    GROUP BY e.id
+    ORDER BY e.date_time ${order}
+    `,
+    [new Date()]
+  );
+
   return result.rows;
 }
 
